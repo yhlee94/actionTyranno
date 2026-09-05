@@ -1,0 +1,27 @@
+<Window x:Class="ActionTyranno.App.Views.CoordinatePickerOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#55000000"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        Cursor="Cross"
+        Focusable="True">
+    <Canvas x:Name="RootCanvas" ClipToBounds="True">
+        <Line x:Name="HorizontalLine" Stroke="Red" StrokeThickness="1" SnapsToDevicePixels="True"/>
+        <Line x:Name="VerticalLine" Stroke="Red" StrokeThickness="1" SnapsToDevicePixels="True"/>
+
+        <Border x:Name="CoordLabelBorder" Background="#CC000000" Padding="6,3" CornerRadius="3">
+            <TextBlock x:Name="CoordLabel" Foreground="White" FontSize="14" FontFamily="Consolas"/>
+        </Border>
+
+        <Ellipse x:Name="Marker" Width="18" Height="18" Stroke="Red" StrokeThickness="3"
+                 Visibility="Collapsed"/>
+
+        <TextBlock Text="클릭하여 좌표 확정 · ESC로 취소" Foreground="White" FontSize="16"
+                   Canvas.Left="24" Canvas.Top="24"/>
+    </Canvas>
+</Window>
