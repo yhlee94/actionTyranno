@@ -39,7 +39,10 @@ public class MacroPlayer
                 break;
 
             case ActionType.MouseClick:
-                _simulator.Click(action.X ?? 0, action.Y ?? 0, action.Button ?? MouseButton.Left);
+                if (action.DoubleClick)
+                    _simulator.DoubleClick(action.X ?? 0, action.Y ?? 0, action.Button ?? MouseButton.Left);
+                else
+                    _simulator.Click(action.X ?? 0, action.Y ?? 0, action.Button ?? MouseButton.Left);
                 break;
 
             case ActionType.KeyPress:

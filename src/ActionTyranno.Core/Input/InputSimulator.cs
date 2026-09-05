@@ -32,7 +32,22 @@ public class InputSimulator
     public void Click(int x, int y, MouseButton button = MouseButton.Left)
     {
         MoveMouseTo(x, y);
+        SendClick(button);
+    }
 
+    /// <summary>
+    /// Two clicks close enough together in time and position for Windows' own double-click
+    /// detection (GetDoubleClickTime/GetSystemMetrics(SM_CXDOUBLECLK)) to register them as one.
+    /// </summary>
+    public void DoubleClick(int x, int y, MouseButton button = MouseButton.Left)
+    {
+        MoveMouseTo(x, y);
+        SendClick(button);
+        SendClick(button);
+    }
+
+    private static void SendClick(MouseButton button)
+    {
         var (downFlag, upFlag) = button switch
         {
             MouseButton.Left => (MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP),

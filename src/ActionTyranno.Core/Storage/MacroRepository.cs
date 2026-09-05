@@ -90,6 +90,50 @@ public class MacroRepository
         }
     }
 
+    /// <summary>Adds a macro from an external source (e.g. an imported file), assigning it a fresh id.</summary>
+    public Macro Import(Macro source)
+    {
+        lock (_lock)
+        {
+            var nextId = _macros.Count == 0 ? 1 : _macros.Max(m => m.Id) + 1;
+            var macro = new Macro
+            {
+                Id = nextId,
+                Name = source.Name,
+                Actions = source.Actions,
+                RepeatCount = source.RepeatCount
+            };
+            _macros.Add(macro);
+            Save();
+            return macro;
+        }
+    }
+
+    /// <summary>Serializes a single macro for sharing (e.g. exporting to a file).</summary>
+    public static string SerializeMacro(Macro macro) => JsonSerializer.Serialize(macro, JsonOptions);
+
+    /// <summary>
+    /// Parses a shared macro file, accepting either a single macro object or an array of macros
+    /// (so multiple exported files can be concatenated, or "export all" style files still import).
+    /// </summary>
+    public static List<Macro> ParseSharedMacros(string json)
+    {
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<Macro>>(json, JsonOptions);
+            if (list != null)
+                return list;
+        }
+        catch (JsonException)
+        {
+            // fall through and try as a single object
+        }
+
+        var single = JsonSerializer.Deserialize<Macro>(json, JsonOptions)
+            ?? throw new InvalidOperationException("올바른 매크로 JSON 형식이 아닙니다.");
+        return new List<Macro> { single };
+    }
+
     public void Load()
     {
         lock (_lock)

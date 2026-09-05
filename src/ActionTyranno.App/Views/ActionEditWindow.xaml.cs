@@ -22,6 +22,7 @@ public partial class ActionEditWindow : Window
             if (existing.X.HasValue) XTextBox.Text = existing.X.Value.ToString();
             if (existing.Y.HasValue) YTextBox.Text = existing.Y.Value.ToString();
             MouseButtonComboBox.SelectedItem = existing.Button ?? Core.Models.MouseButton.Left;
+            DoubleClickCheckBox.IsChecked = existing.DoubleClick;
             KeyTextBox.Text = existing.Key ?? string.Empty;
             KeysTextBox.Text = existing.Keys != null ? string.Join(",", existing.Keys) : string.Empty;
             DelayTextBox.Text = DelaySecondsFormat.ToDisplayString(existing.DelayAfterMs);
@@ -57,6 +58,8 @@ public partial class ActionEditWindow : Window
             ? Visibility.Visible : Visibility.Collapsed;
         KeyComboPanel.Visibility = type == ActionType.KeyCombo
             ? Visibility.Visible : Visibility.Collapsed;
+        DelayPanel.Visibility = type == ActionType.Delay
+            ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnPickCoordinateClick(object sender, RoutedEventArgs e)
@@ -73,14 +76,8 @@ public partial class ActionEditWindow : Window
     {
         ErrorText.Text = string.Empty;
 
-        if (!DelaySecondsFormat.TryParseToMs(DelayTextBox.Text, out var delay))
-        {
-            ErrorText.Text = "지연(초)은 0 이상의 숫자여야 합니다. (예: 1, 2.5, 60)";
-            return;
-        }
-
         var type = SelectedType;
-        var action = new MacroAction { Type = type, DelayAfterMs = delay };
+        var action = new MacroAction { Type = type };
 
         switch (type)
         {
@@ -94,7 +91,10 @@ public partial class ActionEditWindow : Window
                 action.X = x;
                 action.Y = y;
                 if (type == ActionType.MouseClick)
+                {
                     action.Button = (Core.Models.MouseButton)MouseButtonComboBox.SelectedItem;
+                    action.DoubleClick = DoubleClickCheckBox.IsChecked == true;
+                }
                 break;
 
             case ActionType.KeyPress:
@@ -125,7 +125,12 @@ public partial class ActionEditWindow : Window
                 break;
 
             case ActionType.Delay:
-                // DelayAfterMs already carries the wait duration; no extra fields needed.
+                if (!DelaySecondsFormat.TryParseToMs(DelayTextBox.Text, out var delay))
+                {
+                    ErrorText.Text = "대기 시간(초)은 0 이상의 숫자여야 합니다. (예: 1, 2.5, 60)";
+                    return;
+                }
+                action.DelayAfterMs = delay;
                 break;
         }
 

@@ -10,6 +10,7 @@ public class MacroAction
 
     // MouseClick only
     public MouseButton? Button { get; set; }
+    public bool DoubleClick { get; set; }
 
     // KeyPress only, e.g. "A", "Enter", "F6"
     public string? Key { get; set; }

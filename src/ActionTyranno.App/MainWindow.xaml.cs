@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -8,6 +9,7 @@ using ActionTyranno.App.Views;
 using ActionTyranno.Core.Execution;
 using ActionTyranno.Core.Models;
 using ActionTyranno.Core.Storage;
+using Microsoft.Win32;
 
 namespace ActionTyranno.App;
 
@@ -79,6 +81,83 @@ public partial class MainWindow : Window
 
         _repository.Delete(macro.Id);
         _macros.Remove(macro);
+    }
+
+    private void OnExportMacroClick(object sender, RoutedEventArgs e)
+    {
+        if (SelectedMacro is not { } macro)
+            return;
+
+        var dialog = new SaveFileDialog
+        {
+            Title = "매크로 내보내기",
+            FileName = SanitizeFileName(macro.Name) + ".json",
+            Filter = "JSON 파일 (*.json)|*.json"
+        };
+
+        if (dialog.ShowDialog(this) != true)
+            return;
+
+        try
+        {
+            File.WriteAllText(dialog.FileName, MacroRepository.SerializeMacro(macro));
+            MessageBox.Show(this, $"'{macro.Name}' 매크로를 내보냈습니다.", "내보내기 완료",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, $"내보내기에 실패했습니다: {ex.Message}", "오류",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void OnImportMacroClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "매크로 가져오기",
+            Filter = "JSON 파일 (*.json)|*.json"
+        };
+
+        if (dialog.ShowDialog(this) != true)
+            return;
+
+        List<Macro> imported;
+        try
+        {
+            var json = File.ReadAllText(dialog.FileName);
+            imported = MacroRepository.ParseSharedMacros(json);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, $"가져오기에 실패했습니다: {ex.Message}", "오류",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+
+        Macro? lastImported = null;
+        foreach (var source in imported)
+            lastImported = _repository.Import(source);
+
+        if (lastImported == null)
+            return;
+
+        foreach (var macro in _repository.GetAll())
+        {
+            if (_macros.All(m => m.Id != macro.Id))
+                _macros.Add(macro);
+        }
+
+        MacroListBox.SelectedItem = _macros.FirstOrDefault(m => m.Id == lastImported.Id);
+        MessageBox.Show(this, $"매크로 {imported.Count}개를 가져왔습니다.", "가져오기 완료",
+            MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars();
+        var sanitized = new string(name.Select(c => invalid.Contains(c) ? '_' : c).ToArray()).Trim();
+        return sanitized.Length == 0 ? "macro" : sanitized;
     }
 
     private void OnMacroSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
