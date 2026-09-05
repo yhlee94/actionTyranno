@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:ActionTyranno.App"
         xmlns:fmt="clr-namespace:ActionTyranno.App.Formatting"
         mc:Ignorable="d"
-        Title="ActionTyranno" Height="600" Width="1000" WindowStartupLocation="CenterScreen">
+        Title="ActionTyranno" Height="600" Width="1000" WindowStartupLocation="CenterScreen"
+        Icon="Assets/AppIcon.ico">
     <Window.Resources>
         <fmt:MacroActionDetailConverter x:Key="MacroActionDetailConverter"/>
         <fmt:IndexPlusOneConverter x:Key="IndexPlusOneConverter"/>
