@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\AppIcon.ico" />
+    <Resource Include="Assets\logo.png" />
   </ItemGroup>
 
   <PropertyGroup>

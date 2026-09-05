@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using ActionTyranno.App.Interop;
 using ActionTyranno.App.Views;
@@ -179,6 +180,38 @@ public partial class MainWindow : Window
             RepeatCountTextBox.Text = string.Empty;
             EditorPanel.IsEnabled = false;
         }
+
+        UpdateTotalTimeText();
+    }
+
+    private void OnRepeatIncrementClick(object sender, RoutedEventArgs e) => AdjustRepeatCount(+1);
+
+    private void OnRepeatDecrementClick(object sender, RoutedEventArgs e) => AdjustRepeatCount(-1);
+
+    private void AdjustRepeatCount(int delta)
+    {
+        if (SelectedMacro is not { } macro)
+            return;
+
+        if (!int.TryParse(RepeatCountTextBox.Text, out var count))
+            count = macro.RepeatCount;
+
+        count = Math.Max(1, count + delta);
+        RepeatCountTextBox.Text = count.ToString();
+
+        if (count == macro.RepeatCount)
+            return;
+
+        macro.RepeatCount = count;
+        _repository.Update(macro);
+    }
+
+    private void UpdateTotalTimeText()
+    {
+        var totalMs = _currentActions.Sum(a => a.DelayAfterMs);
+        TotalTimeText.Text = _currentActions.Count == 0
+            ? string.Empty
+            : $"{_currentActions.Count}개 · 예상 {totalMs / 1000.0:0.#}초";
     }
 
     private void OnMacroNameLostFocus(object sender, RoutedEventArgs e)
@@ -348,11 +381,15 @@ public partial class MainWindow : Window
         MacroListPanel.IsEnabled = !isPlaying;
         NameRow.IsEnabled = !isPlaying;
         ActionButtonsPanel.IsEnabled = !isPlaying;
+        StatusDot.Fill = isPlaying
+            ? (Brush)FindResource("AccentGreen")
+            : (Brush)FindResource("TextMuted");
     }
 
     private void PersistCurrentActions(Macro macro)
     {
         macro.Actions = _currentActions.ToList();
         _repository.Update(macro);
+        UpdateTotalTimeText();
     }
 }

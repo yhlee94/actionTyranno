@@ -1,8 +1,9 @@
 <Window x:Class="ActionTyranno.App.Views.ActionEditWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="액션 편집" Height="320" Width="420"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="액션 편집" Height="360" Width="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{StaticResource WindowBg}">
     <StackPanel Margin="16">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
             <TextBlock Text="타입" Width="70" VerticalAlignment="Center"/>
