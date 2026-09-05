@@ -1,0 +1,54 @@
+<Window x:Class="ActionTyranno.App.Views.ActionEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="액션 편집" Height="320" Width="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <StackPanel Margin="16">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="타입" Width="70" VerticalAlignment="Center"/>
+            <ComboBox x:Name="ActionTypeComboBox" AutomationProperties.AutomationId="ActionTypeComboBox" Width="200" SelectionChanged="OnActionTypeChanged"/>
+        </StackPanel>
+
+        <StackPanel x:Name="CoordinatePanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="X" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="XTextBox" AutomationProperties.AutomationId="XTextBox" Width="100" IsReadOnly="True" Margin="0,0,12,0"/>
+                <TextBlock Text="Y" Width="20" VerticalAlignment="Center"/>
+                <TextBox x:Name="YTextBox" AutomationProperties.AutomationId="YTextBox" Width="100" IsReadOnly="True"/>
+            </StackPanel>
+            <Button x:Name="PickCoordinateButton" AutomationProperties.AutomationId="PickCoordinateButton" Content="위치 지정" Width="100" HorizontalAlignment="Left"
+                    Click="OnPickCoordinateClick"/>
+        </StackPanel>
+
+        <StackPanel x:Name="MouseButtonPanel" Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="버튼" Width="70" VerticalAlignment="Center"/>
+            <ComboBox x:Name="MouseButtonComboBox" Width="200"/>
+        </StackPanel>
+
+        <StackPanel x:Name="KeyPanel" Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="키" Width="70" VerticalAlignment="Center"/>
+            <TextBox x:Name="KeyTextBox" AutomationProperties.AutomationId="KeyTextBox" Width="200"/>
+        </StackPanel>
+
+        <StackPanel x:Name="KeyComboPanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="키 조합" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="KeysTextBox" AutomationProperties.AutomationId="KeysTextBox" Width="270"/>
+            </StackPanel>
+            <TextBlock Text="쉼표로 구분 (예: Ctrl,Alt,Delete)" Foreground="Gray" FontSize="11" Margin="70,4,0,0"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="지연(초)" Width="70" VerticalAlignment="Center"/>
+            <TextBox x:Name="DelayTextBox" AutomationProperties.AutomationId="DelayTextBox" Width="100"/>
+            <TextBlock Text="예: 1, 2.5, 60" Foreground="Gray" FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button AutomationProperties.AutomationId="OkButton" Content="확인" Width="80" Margin="0,0,8,0" Click="OnOkClick" IsDefault="True"/>
+            <Button AutomationProperties.AutomationId="CancelButton" Content="취소" Width="80" Click="OnCancelClick" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

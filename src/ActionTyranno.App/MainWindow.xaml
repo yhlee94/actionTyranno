@@ -4,11 +4,99 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ActionTyranno.App"
+        xmlns:fmt="clr-namespace:ActionTyranno.App.Formatting"
         mc:Ignorable="d"
-        Title="ActionTyranno" Height="450" Width="800" WindowStartupLocation="CenterScreen">
-    <StackPanel Margin="24" VerticalAlignment="Top">
-        <Button x:Name="PickCoordinateButton" Content="위치 지정" Width="140" Height="36"
-                HorizontalAlignment="Left" Click="OnPickCoordinateClick"/>
-        <TextBlock x:Name="ResultText" Margin="0,16,0,0" FontSize="16" Text="좌표를 지정해보세요."/>
-    </StackPanel>
+        Title="ActionTyranno" Height="600" Width="1000" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <fmt:MacroActionDetailConverter x:Key="MacroActionDetailConverter"/>
+        <fmt:IndexPlusOneConverter x:Key="IndexPlusOneConverter"/>
+        <fmt:DelaySecondsConverter x:Key="DelaySecondsConverter"/>
+    </Window.Resources>
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel x:Name="MacroListPanel" Grid.Column="0">
+            <TextBlock Text="매크로 목록" FontWeight="Bold" Margin="0,0,0,8" DockPanel.Dock="Top"/>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                <Button x:Name="NewMacroButton" AutomationProperties.AutomationId="NewMacroButton" Content="새 매크로" Width="90" Margin="0,0,6,0" Click="OnNewMacroClick"/>
+                <Button x:Name="DeleteMacroButton" AutomationProperties.AutomationId="DeleteMacroButton" Content="삭제" Width="70" Click="OnDeleteMacroClick"/>
+            </StackPanel>
+            <ListBox x:Name="MacroListBox" AutomationProperties.AutomationId="MacroListBox" SelectionChanged="OnMacroSelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}번 - {1}">
+                                    <Binding Path="Id"/>
+                                    <Binding Path="Name"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <DockPanel x:Name="EditorPanel" Grid.Column="2" IsEnabled="False">
+            <StackPanel x:Name="NameRow" DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="이름" Width="40" VerticalAlignment="Center"/>
+                <TextBox x:Name="MacroNameTextBox" AutomationProperties.AutomationId="MacroNameTextBox" Width="260" LostFocus="OnMacroNameLostFocus"/>
+            </StackPanel>
+
+            <StackPanel x:Name="PlaybackRow" DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,12">
+                <TextBlock x:Name="RepeatCountLabel" Text="반복 횟수" Width="60" VerticalAlignment="Center"/>
+                <TextBox x:Name="RepeatCountTextBox" AutomationProperties.AutomationId="RepeatCountTextBox" Width="60" Margin="0,0,16,0" LostFocus="OnRepeatCountLostFocus"/>
+                <Button x:Name="PlayButton" AutomationProperties.AutomationId="PlayButton" Content="▶ 재생" Width="80" Margin="0,0,6,0" Click="OnPlayClick"/>
+                <Button x:Name="StopButton" AutomationProperties.AutomationId="StopButton" Content="■ 정지" Width="80" IsEnabled="False" Click="OnStopClick"/>
+                <TextBlock x:Name="PlaybackStatusText" VerticalAlignment="Center" Margin="16,0,0,0" Foreground="Gray"/>
+            </StackPanel>
+
+            <StackPanel x:Name="ActionButtonsPanel" DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,8,0,0">
+                <Button AutomationProperties.AutomationId="AddActionButton" Content="액션 추가" Width="90" Margin="0,0,6,0" Click="OnAddActionClick"/>
+                <Button AutomationProperties.AutomationId="EditActionButton" Content="편집" Width="70" Margin="0,0,6,0" Click="OnEditActionClick"/>
+                <Button AutomationProperties.AutomationId="DeleteActionButton" Content="삭제" Width="70" Margin="0,0,6,0" Click="OnDeleteActionClick"/>
+                <Button AutomationProperties.AutomationId="MoveUpButton" Content="▲ 위로" Width="70" Margin="0,0,6,0" Click="OnMoveUpClick"/>
+                <Button AutomationProperties.AutomationId="MoveDownButton" Content="▼ 아래로" Width="80" Click="OnMoveDownClick"/>
+            </StackPanel>
+
+            <ListView x:Name="ActionListView" AutomationProperties.AutomationId="ActionListView" AlternationCount="100000">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="#" Width="40">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource IndexPlusOneConverter}}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="타입" Width="110">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Type}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="상세" Width="320">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource MacroActionDetailConverter}}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="지연(초)" Width="90">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DelayAfterMs, Converter={StaticResource DelaySecondsConverter}}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
+    </Grid>
 </Window>
