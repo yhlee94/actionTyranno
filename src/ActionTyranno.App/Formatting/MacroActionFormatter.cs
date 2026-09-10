@@ -9,6 +9,7 @@ public static class MacroActionFormatter
     {
         ActionType.MouseMove => $"마우스 이동 ({action.X}, {action.Y})",
         ActionType.MouseClick => $"마우스 {(action.DoubleClick ? "더블클릭" : "클릭")} [{action.Button}] ({action.X}, {action.Y})",
+        ActionType.MouseScroll => $"마우스 스크롤 {ScrollDirectionLabel(action)} {Math.Abs(action.ScrollAmount ?? 0)}칸 ({action.X}, {action.Y})",
         ActionType.KeyPress => $"키 입력 [{action.Key}]",
         ActionType.KeyCombo => $"키 조합 [{string.Join(" + ", action.Keys ?? new List<string>())}]",
         ActionType.Delay => "대기",
@@ -20,9 +21,12 @@ public static class MacroActionFormatter
     {
         ActionType.MouseMove => $"좌표 ({action.X}, {action.Y})",
         ActionType.MouseClick => $"[{action.Button}] 좌표 ({action.X}, {action.Y})",
+        ActionType.MouseScroll => $"{ScrollDirectionLabel(action)} {Math.Abs(action.ScrollAmount ?? 0)}칸 · 좌표 ({action.X}, {action.Y})",
         ActionType.KeyPress => $"[{action.Key}]",
         ActionType.KeyCombo => $"[{string.Join(" + ", action.Keys ?? new List<string>())}]",
         ActionType.Delay => string.Empty,
         _ => string.Empty
     };
+
+    private static string ScrollDirectionLabel(MacroAction action) => (action.ScrollAmount ?? 0) < 0 ? "아래로" : "위로";
 }

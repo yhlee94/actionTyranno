@@ -1,5 +1,5 @@
 #define MyAppName "ActionTyranno"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "2.0.0"
 #define MyAppPublisher "ActionTyranno"
 #define MyAppExeName "ActionTyranno.App.exe"
 

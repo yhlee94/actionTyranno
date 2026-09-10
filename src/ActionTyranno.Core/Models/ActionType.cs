@@ -4,6 +4,7 @@ public enum ActionType
 {
     MouseMove,
     MouseClick,
+    MouseScroll,
     KeyPress,
     KeyCombo,
     Delay

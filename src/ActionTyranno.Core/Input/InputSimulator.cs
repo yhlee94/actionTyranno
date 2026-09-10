@@ -46,6 +46,13 @@ public class InputSimulator
         SendClick(button);
     }
 
+    /// <summary>Scrolls the wheel at (x, y). Positive notches scroll up, negative scroll down.</summary>
+    public void Scroll(int x, int y, int notches)
+    {
+        MoveMouseTo(x, y);
+        SendMouseInput(MOUSEEVENTF_WHEEL, unchecked((uint)(notches * WHEEL_DELTA)));
+    }
+
     private static void SendClick(MouseButton button)
     {
         var (downFlag, upFlag) = button switch
@@ -80,12 +87,12 @@ public class InputSimulator
             SendKeyInput(vks[i], keyUp: true);
     }
 
-    private static void SendMouseInput(uint flags)
+    private static void SendMouseInput(uint flags, uint mouseData = 0)
     {
         var input = new INPUT
         {
             type = INPUT_MOUSE,
-            U = new InputUnion { mi = new MOUSEINPUT { dwFlags = flags } }
+            U = new InputUnion { mi = new MOUSEINPUT { dwFlags = flags, mouseData = mouseData } }
         };
         SendInput(1, new[] { input }, System.Runtime.InteropServices.Marshal.SizeOf<INPUT>());
     }

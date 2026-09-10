@@ -14,6 +14,7 @@ public class ActionTypeLabelConverter : IValueConverter
         {
             ActionType.MouseMove => "마우스 이동",
             ActionType.MouseClick => action.DoubleClick ? "마우스 더블클릭" : "마우스 클릭",
+            ActionType.MouseScroll => "마우스 스크롤",
             ActionType.KeyPress => "키 입력",
             ActionType.KeyCombo => "키 조합",
             ActionType.Delay => "대기",
@@ -32,6 +33,7 @@ public class ActionTypeIconConverter : IValueConverter
         {
             ActionType.MouseMove => "✥",   // move cursor glyph
             ActionType.MouseClick => "◉",  // click target glyph
+            ActionType.MouseScroll => "⇅", // scroll wheel glyph
             ActionType.KeyPress => "⌨",    // keyboard glyph
             ActionType.KeyCombo => "⌨",
             ActionType.Delay => "⏱",       // stopwatch glyph
@@ -51,6 +53,7 @@ public class ActionTypeAccentConverter : IValueConverter
         {
             ActionType.MouseMove => "AccentMouseMove",
             ActionType.MouseClick => "AccentMouseClick",
+            ActionType.MouseScroll => "AccentMouseScroll",
             ActionType.KeyPress => "AccentKeyPress",
             ActionType.KeyCombo => "AccentKeyCombo",
             ActionType.Delay => "AccentDelay",

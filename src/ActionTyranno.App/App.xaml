@@ -22,6 +22,7 @@
             <!-- Per action-type accent colors -->
             <SolidColorBrush x:Key="AccentMouseClick" Color="#22C55E"/>
             <SolidColorBrush x:Key="AccentMouseMove" Color="#3B82F6"/>
+            <SolidColorBrush x:Key="AccentMouseScroll" Color="#06B6D4"/>
             <SolidColorBrush x:Key="AccentKeyPress" Color="#A855F7"/>
             <SolidColorBrush x:Key="AccentKeyCombo" Color="#8B5CF6"/>
             <SolidColorBrush x:Key="AccentDelay" Color="#F59E0B"/>

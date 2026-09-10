@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using ActionTyranno.App.Formatting;
 using ActionTyranno.App.Interop;
 using ActionTyranno.App.Views;
 using ActionTyranno.Core.Execution;
@@ -169,6 +170,7 @@ public partial class MainWindow : Window
         {
             MacroNameTextBox.Text = macro.Name;
             RepeatCountTextBox.Text = macro.RepeatCount.ToString();
+            MouseIntervalTextBox.Text = DelaySecondsFormat.ToDisplayString(macro.MouseActionDelayMs);
             PlaybackStatusText.Text = string.Empty;
             foreach (var action in macro.Actions)
                 _currentActions.Add(action);
@@ -178,6 +180,7 @@ public partial class MainWindow : Window
         {
             MacroNameTextBox.Text = string.Empty;
             RepeatCountTextBox.Text = string.Empty;
+            MouseIntervalTextBox.Text = string.Empty;
             EditorPanel.IsEnabled = false;
         }
 
@@ -208,10 +211,35 @@ public partial class MainWindow : Window
 
     private void UpdateTotalTimeText()
     {
-        var totalMs = _currentActions.Sum(a => a.DelayAfterMs);
-        TotalTimeText.Text = _currentActions.Count == 0
-            ? string.Empty
-            : $"{_currentActions.Count}개 · 예상 {totalMs / 1000.0:0.#}초";
+        if (_currentActions.Count == 0)
+        {
+            TotalTimeText.Text = string.Empty;
+            return;
+        }
+
+        var mouseIntervalMs = DelaySecondsFormat.TryParseToMs(MouseIntervalTextBox.Text, out var ms) ? ms : 0;
+        var mouseActionCount = _currentActions.Count(a => a.Type is ActionType.MouseMove or ActionType.MouseClick or ActionType.MouseScroll);
+        var totalMs = _currentActions.Sum(a => a.DelayAfterMs) + mouseActionCount * mouseIntervalMs;
+
+        TotalTimeText.Text = $"{_currentActions.Count}개 · 예상 {totalMs / 1000.0:0.#}초";
+    }
+
+    private void OnMouseIntervalLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (SelectedMacro is not { } macro)
+            return;
+
+        if (!DelaySecondsFormat.TryParseToMs(MouseIntervalTextBox.Text, out var ms) || ms < 0)
+            ms = macro.MouseActionDelayMs;
+
+        MouseIntervalTextBox.Text = DelaySecondsFormat.ToDisplayString(ms);
+        UpdateTotalTimeText();
+
+        if (ms == macro.MouseActionDelayMs)
+            return;
+
+        macro.MouseActionDelayMs = ms;
+        _repository.Update(macro);
     }
 
     private void OnMacroNameLostFocus(object sender, RoutedEventArgs e)
@@ -342,6 +370,13 @@ public partial class MainWindow : Window
             _repository.Update(macro);
         }
 
+        if (DelaySecondsFormat.TryParseToMs(MouseIntervalTextBox.Text, out var mouseIntervalMs)
+            && mouseIntervalMs != macro.MouseActionDelayMs)
+        {
+            macro.MouseActionDelayMs = mouseIntervalMs;
+            _repository.Update(macro);
+        }
+
         SetPlaybackState(isPlaying: true);
         PlaybackStatusText.Text = "실행 중... (0.0초)";
         _playStopwatch.Restart();
@@ -378,6 +413,7 @@ public partial class MainWindow : Window
         PlayButton.IsEnabled = !isPlaying;
         StopButton.IsEnabled = isPlaying;
         RepeatCountTextBox.IsEnabled = !isPlaying;
+        MouseIntervalRow.IsEnabled = !isPlaying;
         MacroListPanel.IsEnabled = !isPlaying;
         NameRow.IsEnabled = !isPlaying;
         ActionButtonsPanel.IsEnabled = !isPlaying;

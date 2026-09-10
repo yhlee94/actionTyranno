@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ActionTyranno.App"
         xmlns:fmt="clr-namespace:ActionTyranno.App.Formatting"
         mc:Ignorable="d"
-        Title="ActionTyranno" Height="760" Width="400" MinWidth="360" MinHeight="560"
+        Title="ActionTyranno v2" Height="760" Width="400" MinWidth="360" MinHeight="560"
         WindowStartupLocation="CenterScreen" Icon="Assets/AppIcon.ico"
         Background="{StaticResource WindowBg}">
     <Window.Resources>
@@ -97,7 +97,7 @@
         <!-- Header: logo + title -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
             <Image Source="Assets/logo.png" Width="34" Height="34" Margin="0,0,10,0"/>
-            <TextBlock Text="ActionTyranno" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Text="ActionTyranno v2" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
         </StackPanel>
 
         <!-- Macro chips -->
@@ -137,6 +137,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -163,7 +164,18 @@
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="2" Margin="0,14,0,0">
+            <Grid Grid.Row="2" x:Name="MouseIntervalRow" Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="마우스 동작 간격(초)" FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" x:Name="MouseIntervalTextBox" AutomationProperties.AutomationId="MouseIntervalTextBox"
+                         Width="60" HorizontalAlignment="Right" TextAlignment="Center" Padding="0,7"
+                         LostFocus="OnMouseIntervalLostFocus"/>
+            </Grid>
+
+            <Grid Grid.Row="3" Margin="0,14,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="10"/>
@@ -177,12 +189,12 @@
                         Click="OnStopClick"/>
             </Grid>
 
-            <StackPanel Grid.Row="3" x:Name="StatusRow" Orientation="Horizontal" Margin="0,10,0,0">
+            <StackPanel Grid.Row="4" x:Name="StatusRow" Orientation="Horizontal" Margin="0,10,0,0">
                 <Ellipse x:Name="StatusDot" Width="8" Height="8" Fill="{StaticResource TextMuted}" Margin="0,0,6,0"/>
                 <TextBlock x:Name="PlaybackStatusText" FontSize="12" Foreground="{StaticResource TextSecondary}"/>
             </StackPanel>
 
-            <Grid Grid.Row="4" Margin="0,16,0,8">
+            <Grid Grid.Row="5" Margin="0,16,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -191,11 +203,11 @@
                 <TextBlock Grid.Column="1" x:Name="TotalTimeText" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
             </Grid>
 
-            <ListBox x:Name="ActionListView" AutomationProperties.AutomationId="ActionListView" Grid.Row="5"
+            <ListBox x:Name="ActionListView" AutomationProperties.AutomationId="ActionListView" Grid.Row="6"
                      Style="{StaticResource ActionCardList}" ItemTemplate="{StaticResource ActionCardTemplate}"
                      AlternationCount="100000" ScrollViewer.CanContentScroll="False"/>
 
-            <StackPanel Grid.Row="6" x:Name="ActionButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <StackPanel Grid.Row="7" x:Name="ActionButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <Button AutomationProperties.AutomationId="AddActionButton" Content="＋" ToolTip="액션 추가"
                         Style="{StaticResource IconButton}" Click="OnAddActionClick" Margin="0,0,8,0"/>
                 <Button AutomationProperties.AutomationId="EditActionButton" Content="✎" ToolTip="편집"

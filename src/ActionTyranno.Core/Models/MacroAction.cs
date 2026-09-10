@@ -4,13 +4,16 @@ public class MacroAction
 {
     public ActionType Type { get; set; }
 
-    // MouseMove / MouseClick: virtual-screen coordinates
+    // MouseMove / MouseClick / MouseScroll: virtual-screen coordinates
     public int? X { get; set; }
     public int? Y { get; set; }
 
     // MouseClick only
     public MouseButton? Button { get; set; }
     public bool DoubleClick { get; set; }
+
+    // MouseScroll only: signed wheel notches (positive = scroll up, negative = scroll down)
+    public int? ScrollAmount { get; set; }
 
     // KeyPress only, e.g. "A", "Enter", "F6"
     public string? Key { get; set; }

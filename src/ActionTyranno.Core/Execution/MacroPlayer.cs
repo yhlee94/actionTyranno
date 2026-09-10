@@ -24,8 +24,9 @@ public class MacroPlayer
 
                 Execute(action);
 
-                if (action.DelayAfterMs > 0)
-                    await Task.Delay(action.DelayAfterMs, cancellationToken);
+                var waitMs = IsMouseAction(action.Type) ? macro.MouseActionDelayMs : action.DelayAfterMs;
+                if (waitMs > 0)
+                    await Task.Delay(waitMs, cancellationToken);
             }
         }
     }
@@ -45,6 +46,10 @@ public class MacroPlayer
                     _simulator.Click(action.X ?? 0, action.Y ?? 0, action.Button ?? MouseButton.Left);
                 break;
 
+            case ActionType.MouseScroll:
+                _simulator.Scroll(action.X ?? 0, action.Y ?? 0, action.ScrollAmount ?? 0);
+                break;
+
             case ActionType.KeyPress:
                 if (!string.IsNullOrEmpty(action.Key))
                     _simulator.KeyPress(action.Key);
@@ -60,4 +65,7 @@ public class MacroPlayer
                 break;
         }
     }
+
+    private static bool IsMouseAction(ActionType type) =>
+        type is ActionType.MouseMove or ActionType.MouseClick or ActionType.MouseScroll;
 }
