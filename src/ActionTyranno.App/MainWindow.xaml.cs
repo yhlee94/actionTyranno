@@ -64,6 +64,11 @@ public partial class MainWindow : Window
         base.OnClosed(e);
     }
 
+    private void OnPromptManagerClick(object sender, RoutedEventArgs e)
+    {
+        new Views.PromptEditorWindow { Owner = this }.ShowDialog();
+    }
+
     private void OnNewMacroClick(object sender, RoutedEventArgs e)
     {
         var macro = _repository.Add("새 매크로");
@@ -393,6 +398,11 @@ public partial class MainWindow : Window
         {
             _elapsedTimer.Stop();
             PlaybackStatusText.Text = $"정지됨 ({_playStopwatch.Elapsed.TotalSeconds:0.0}초)";
+        }
+        catch (Exception ex)
+        {
+            _elapsedTimer.Stop();
+            PlaybackStatusText.Text = $"오류로 중단됨: {ex.Message}";
         }
         finally
         {

@@ -10,7 +10,9 @@ namespace ActionTyranno.App.Formatting;
 public class ActionTypeLabelConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        value is not MacroAction action ? string.Empty : action.Type switch
+        value is not MacroAction action ? string.Empty
+        : !string.IsNullOrWhiteSpace(action.Name) ? action.Name.Trim()
+        : action.Type switch
         {
             ActionType.MouseMove => "마우스 이동",
             ActionType.MouseClick => action.DoubleClick ? "마우스 더블클릭" : "마우스 클릭",
@@ -18,6 +20,10 @@ public class ActionTypeLabelConverter : IValueConverter
             ActionType.KeyPress => "키 입력",
             ActionType.KeyCombo => "키 조합",
             ActionType.Delay => "대기",
+            ActionType.ReadFile => "파일 읽기",
+            ActionType.AiRequest => "AI 요청",
+            ActionType.LaunchUrl => "URL 열기",
+            ActionType.PasteText => "텍스트 붙여넣기",
             _ => action.Type.ToString()
         };
 
@@ -37,6 +43,10 @@ public class ActionTypeIconConverter : IValueConverter
             ActionType.KeyPress => "⌨",    // keyboard glyph
             ActionType.KeyCombo => "⌨",
             ActionType.Delay => "⏱",       // stopwatch glyph
+            ActionType.ReadFile => "▤",
+            ActionType.AiRequest => "✦",
+            ActionType.LaunchUrl => "↗",
+            ActionType.PasteText => "⎘",
             _ => "•"
         };
 
@@ -57,6 +67,10 @@ public class ActionTypeAccentConverter : IValueConverter
             ActionType.KeyPress => "AccentKeyPress",
             ActionType.KeyCombo => "AccentKeyCombo",
             ActionType.Delay => "AccentDelay",
+            ActionType.ReadFile => "AccentReadFile",
+            ActionType.AiRequest => "AccentAiRequest",
+            ActionType.LaunchUrl => "AccentLaunchUrl",
+            ActionType.PasteText => "AccentPasteText",
             _ => "AccentMouseClick"
         } : "AccentMouseClick";
 

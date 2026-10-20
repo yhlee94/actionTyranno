@@ -7,5 +7,9 @@ public enum ActionType
     MouseScroll,
     KeyPress,
     KeyCombo,
-    Delay
+    Delay,
+    ReadFile,
+    AiRequest,
+    LaunchUrl,
+    PasteText
 }

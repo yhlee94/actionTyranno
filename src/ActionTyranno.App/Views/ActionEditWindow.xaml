@@ -1,13 +1,22 @@
 <Window x:Class="ActionTyranno.App.Views.ActionEditWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="액션 편집" Height="360" Width="420"
+        Title="액션 편집" SizeToContent="Height" Width="420"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="{StaticResource WindowBg}">
     <StackPanel Margin="16">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
             <TextBlock Text="타입" Width="70" VerticalAlignment="Center"/>
             <ComboBox x:Name="ActionTypeComboBox" AutomationProperties.AutomationId="ActionTypeComboBox" Width="200" SelectionChanged="OnActionTypeChanged"/>
+        </StackPanel>
+
+        <StackPanel Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="이름" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="ActionNameTextBox" AutomationProperties.AutomationId="ActionNameTextBox" Width="270" MaxLength="40"/>
+            </StackPanel>
+            <TextBlock Text="선택 사항 (예: AI 응답 대기, 로그인 클릭). 비우면 기본 이름이 표시됩니다."
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="70,4,0,0"/>
         </StackPanel>
 
         <StackPanel x:Name="CoordinatePanel" Margin="0,0,0,12">
@@ -52,6 +61,59 @@
             <TextBlock Text="대기 시간(초)" Width="70" VerticalAlignment="Center"/>
             <TextBox x:Name="DelayTextBox" AutomationProperties.AutomationId="DelayTextBox" Width="100"/>
             <TextBlock Text="예: 1, 2.5, 60" Foreground="Gray" FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel x:Name="ReadFilePanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="폴더/파일" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="FolderPathTextBox" AutomationProperties.AutomationId="FolderPathTextBox" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="파일 패턴" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="FilePatternTextBox" AutomationProperties.AutomationId="FilePatternTextBox" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="저장 변수" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="ReadVariableTextBox" AutomationProperties.AutomationId="ReadVariableTextBox" Width="270"/>
+            </StackPanel>
+            <TextBlock Text="폴더면 패턴(예: security-filtered-*.log)에 맞는 가장 최근 파일을 읽습니다. 변수는 {이름} 으로 사용합니다."
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="70,4,0,0"/>
+        </StackPanel>
+
+        <StackPanel x:Name="AiRequestPanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="프롬프트" Width="70" VerticalAlignment="Center"/>
+                <ComboBox x:Name="PromptComboBox" AutomationProperties.AutomationId="PromptComboBox" Width="270" DisplayMemberPath="Name"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="저장 변수" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="AiVariableTextBox" AutomationProperties.AutomationId="AiVariableTextBox" Width="270"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="파일 저장" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="SaveResultPathTextBox" AutomationProperties.AutomationId="SaveResultPathTextBox" Width="270"/>
+            </StackPanel>
+            <TextBlock Text="'파일 저장'은 선택 사항입니다 (결과를 파일로도 남길 때). 프롬프트는 메인 화면의 '프롬프트 관리'에서 편집합니다."
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="70,4,0,0"/>
+        </StackPanel>
+
+        <StackPanel x:Name="LaunchUrlPanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="URL" Width="70" VerticalAlignment="Center"/>
+                <TextBox x:Name="UrlTextBox" AutomationProperties.AutomationId="UrlTextBox" Width="270"/>
+            </StackPanel>
+            <TextBlock Text="http/https 주소만 가능합니다. 기본 브라우저로 열고 2초 뒤 창을 최대화합니다."
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="70,4,0,0"/>
+        </StackPanel>
+
+        <StackPanel x:Name="PasteTextPanel" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="텍스트" Width="70"/>
+                <TextBox x:Name="PasteTextBox" AutomationProperties.AutomationId="PasteTextBox" Width="270" Height="90"
+                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top"/>
+            </StackPanel>
+            <TextBlock Text="클립보드에 넣고 Ctrl+V로 붙여넣습니다 (클립보드 내용이 바뀝니다). {AiResult} 처럼 변수를 쓸 수 있습니다."
+                       Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="70,4,0,0"/>
         </StackPanel>
 
         <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap" Margin="0,0,0,8"/>

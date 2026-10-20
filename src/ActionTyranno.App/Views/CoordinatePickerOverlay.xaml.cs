@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using ActionTyranno.Core.Input;
@@ -8,14 +10,16 @@ namespace ActionTyranno.App.Views;
 
 /// <summary>
 /// Full virtual-screen, always-on-top overlay used to pick a screen coordinate by clicking.
-/// Coordinates are reported in physical pixels (the same coordinate space InputSimulator uses),
-/// converted from WPF's DPI-independent units via the window's own device transform.
+/// The app is per-monitor DPI aware, so every coordinate here is a physical pixel (the same space
+/// InputSimulator uses). The picked point is read from the real cursor position rather than converted
+/// from WPF's DPI-independent units, and the window is placed with Win32 in physical pixels so it covers
+/// monitors with different scale factors exactly.
 /// </summary>
 public partial class CoordinatePickerOverlay : Window
 {
-    private Matrix _toDip;
-    private Matrix _toDevice;
+    private readonly InputSimulator _input = new();
     private VirtualScreenBounds _bounds;
+    private bool _applyingBounds;
 
     public (int X, int Y)? Result { get; private set; }
 
@@ -31,25 +35,48 @@ public partial class CoordinatePickerOverlay : Window
 
     private void OnSourceInitialized(object? sender, EventArgs e)
     {
-        var source = PresentationSource.FromVisual(this)
-            ?? throw new InvalidOperationException("PresentationSource not available.");
-
-        _toDip = source.CompositionTarget.TransformFromDevice;
-        _toDevice = source.CompositionTarget.TransformToDevice;
-
         _bounds = InputSimulator.GetVirtualScreenBounds();
+        ApplyBounds();
+    }
 
-        // Position/size the window so it exactly covers the physical virtual-screen bounds,
-        // regardless of the DPI scale of the monitor the window happens to be created on.
-        Left = _bounds.X * _toDip.M11;
-        Top = _bounds.Y * _toDip.M22;
-        Width = _bounds.Width * _toDip.M11;
-        Height = _bounds.Height * _toDip.M22;
+    // The window's own DPI can change while it is moved across monitors; WPF then resizes it, so re-apply.
+    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+    {
+        base.OnDpiChanged(oldDpi, newDpi);
+        ApplyBounds();
+    }
+
+    private void ApplyBounds()
+    {
+        if (_applyingBounds)
+            return;
+
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd == IntPtr.Zero)
+            return;
+
+        _applyingBounds = true;
+        try
+        {
+            SetWindowPos(hwnd, HWND_TOPMOST, _bounds.X, _bounds.Y, _bounds.Width, _bounds.Height, SWP_NOACTIVATE);
+        }
+        finally
+        {
+            _applyingBounds = false;
+        }
+    }
+
+    /// <summary>Physical screen pixel -> position inside the window in WPF units, for drawing.</summary>
+    private Point PhysicalToDip((int X, int Y) physical)
+    {
+        var dpi = VisualTreeHelper.GetDpi(this);
+        return new Point((physical.X - _bounds.X) / dpi.DpiScaleX, (physical.Y - _bounds.Y) / dpi.DpiScaleY);
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
-        var dipPos = e.GetPosition(RootCanvas);
+        var physical = _input.GetCursorPosition();
+        var dipPos = PhysicalToDip(physical);
 
         HorizontalLine.X1 = 0;
         HorizontalLine.X2 = ActualWidth;
@@ -59,7 +86,6 @@ public partial class CoordinatePickerOverlay : Window
         VerticalLine.Y2 = ActualHeight;
         VerticalLine.X1 = VerticalLine.X2 = dipPos.X;
 
-        var physical = DipToPhysical(dipPos);
         CoordLabel.Text = $"X: {physical.X}  Y: {physical.Y}";
 
         var labelX = Math.Min(dipPos.X + 18, ActualWidth - CoordLabelBorder.ActualWidth - 4);
@@ -70,8 +96,9 @@ public partial class CoordinatePickerOverlay : Window
 
     private void OnMouseDown(object sender, MouseButtonEventArgs e)
     {
-        var dipPos = e.GetPosition(RootCanvas);
-        Result = DipToPhysical(dipPos);
+        var physical = _input.GetCursorPosition();
+        Result = physical;
+        var dipPos = PhysicalToDip(physical);
 
         MouseMove -= OnMouseMove;
         PreviewMouseLeftButtonDown -= OnMouseDown;
@@ -100,12 +127,6 @@ public partial class CoordinatePickerOverlay : Window
         Close();
     }
 
-    private (int X, int Y) DipToPhysical(Point dipPosInWindow)
-    {
-        var device = _toDevice.Transform(dipPosInWindow);
-        return (_bounds.X + (int)Math.Round(device.X), _bounds.Y + (int)Math.Round(device.Y));
-    }
-
     /// <summary>
     /// Shows the overlay modally and returns the picked physical-pixel coordinate,
     /// or null if the user cancelled with ESC.
@@ -119,4 +140,10 @@ public partial class CoordinatePickerOverlay : Window
         overlay.ShowDialog();
         return overlay.Result;
     }
+
+    private static readonly IntPtr HWND_TOPMOST = new(-1);
+    private const uint SWP_NOACTIVATE = 0x0010;
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
 }

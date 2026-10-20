@@ -126,7 +126,9 @@
             <Button AutomationProperties.AutomationId="ExportMacroButton" Content="내보내기" Padding="12,7"
                     Style="{StaticResource FlatButtonBase}" Click="OnExportMacroClick" Margin="0,0,6,0"/>
             <Button AutomationProperties.AutomationId="ImportMacroButton" Content="가져오기" Padding="12,7"
-                    Style="{StaticResource FlatButtonBase}" Click="OnImportMacroClick"/>
+                    Style="{StaticResource FlatButtonBase}" Click="OnImportMacroClick" Margin="0,0,6,0"/>
+            <Button AutomationProperties.AutomationId="PromptManagerButton" Content="프롬프트 관리" Padding="12,7"
+                    Style="{StaticResource FlatButtonBase}" Click="OnPromptManagerClick"/>
         </StackPanel>
 
         <!-- Editor: everything below is disabled as a unit when no macro is selected -->
